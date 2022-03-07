@@ -3,8 +3,8 @@
 
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
-    protected $liveEndpoint = 'https://api.userede.com.br/erede/';
-    protected $testEndpoint = 'https://sandbox-erede.useredecloud.com.br/';
+    protected $liveEndpoint = 'https://api.userede.com.br/erede';
+    protected $testEndpoint = 'https://sandbox-erede.useredecloud.com.br';
     protected $version = 1;
     protected $requestMethod = 'POST';
     protected $resource = 'transactions';
