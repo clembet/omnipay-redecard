@@ -15,10 +15,10 @@
  * </code>
  */
 
-class VoidRequest extends AbstractRequest   // está dando  erro para vendas com cartao parcelado, não permitindo estornar individualmente o pagamento
+class VoidRequest extends AbstractRequest
 {
     protected $resource = 'transactions';
-    protected $requestMethod = 'PUT';
+    protected $requestMethod = 'POST';
 
 
     public function getData()

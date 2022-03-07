@@ -53,7 +53,7 @@ class NotificationRequest extends AbstractRequest //TODO: refazer
             http_build_query($data, '', '&')
         );
 
-        print $url."\n\n";
+        //print $url."\n\n";
         $httpResponse = $this->httpClient->request($this->getMethod(), $url, ['Content-Type' => 'application/x-www-form-urlencoded']);
         $xml          = @simplexml_load_string($httpResponse->getBody()->getContents(), 'SimpleXMLElement', LIBXML_NOCDATA);
 

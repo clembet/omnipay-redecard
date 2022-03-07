@@ -9,7 +9,7 @@ use Omnipay\Common\Message\AbstractResponse;
  *
  * @see \Omnipay\Pagarme\Gateway
  */
-class Response extends AbstractResponse // TODO: validar essa estrutura
+class Response extends AbstractResponse
 {
     private $validCodes = ['00'];
     /**
@@ -37,25 +37,30 @@ class Response extends AbstractResponse // TODO: validar essa estrutura
      *
      * @return string|null
      */
-    public function getTransactionReference()
+    public function getTransactionID()
     {
         return $this->get('tid');
     }
 
     public function getTransactionAuthorizationCode()
     {
-        return $this->get('tid');
+        return $this->get('authorizationCode');
+    }
+
+    public function getTransactionNSU()
+    {
+        return $this->get('nsu');
     }
 
     public function getStatus()
     {
         $status = null;
-        if(isset($this->data['Payment']['Status']))
-            $status = @$this->data['Payment']['Status'];
+        if(isset($this->data['authorization']['status']))
+            $status = @$this->data['authorization']['status'];
         else
         {
-            if(isset($this->data['Status']))
-                $status = @$this->data['Status'];
+            if(isset($this->data['status']))
+                $status = @$this->data['status'];
         }
 
         return $status;
@@ -63,26 +68,26 @@ class Response extends AbstractResponse // TODO: validar essa estrutura
 
     public function isPaid()
     {
-        $status = $this->getStatus();
-        return $status==2;
+        $status = @strtolower($this->getStatus());
+        return strcmp("approved", $status)==0;
     }
 
     public function isAuthorized()
     {
-        $status = $this->getStatus();
-        return $status==1;
+        $status = @strtolower($this->getStatus());
+        return strcmp("pending", $status)==0;
     }
 
     public function isPending()
     {
-        $status = $this->getStatus();
-        return $status==12;
+        $status = @strtolower($this->getStatus());
+        return strcmp("pending", $status)==0;
     }
 
     public function isVoided()
     {
-        $status = $this->getStatus();
-        return ($status==10||$status==11);
+        $status = @strtolower($this->getStatus());
+        return strcmp("canceled", $status)==0;
     }
 
     public function getCode()
@@ -99,7 +104,7 @@ class Response extends AbstractResponse // TODO: validar essa estrutura
      */
     public function getMessage()
     {
-        return $this->get('returnCode')." - ".$this->get('returnMessage');;
+        return $this->get('returnCode')." - ".$this->get('returnMessage');
 
     }
 }
