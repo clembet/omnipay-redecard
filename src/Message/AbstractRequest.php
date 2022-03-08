@@ -131,11 +131,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->getParameter('soft_descriptor');
     }
 
-    public function getAmount()
-    {
-        return (int)round((parent::getAmount()*100.0), 0);
-    }
-
     public function getTransactionID()
     {
         return $this->getParameter('transactionId');
@@ -144,6 +139,80 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     public function setTransactionID($value)
     {
         return $this->setParameter('transactionId', $value);
+    }
+
+    public function getCustomer()
+    {
+        return $this->getParameter('customer');
+    }
+
+    public function setCustomer($value)
+    {
+        return $this->setParameter('customer', $value);
+    }
+
+    public function getCustomerData()
+    {
+        $card = $this->getCard();
+        $customer = $this->getCustomer();
+
+        $data = [
+            "Name"=>$customer->getName(),
+            "Identity"=>$customer->getDocumentNumber(),
+            "IdentityType"=>"CPF",
+            "Email"=>$customer->getEmail(),
+            "Birthdate"=>$customer->getBirthday('Y-m-d'),// formato ISO
+            "IpAddress"=>$this->getClientIp(),
+            "Address"=>[
+                "Street"=>$customer->getBillingAddress1(),
+                "Number"=>$customer->getBillingNumber(),
+                "Complement"=>$customer->getBillingAddress2(),
+                "ZipCode"=>$customer->getBillingPostcode(),
+                "City"=>$customer->getBillingCity(),
+                "State"=>$customer->getBillingState(),
+                "Country"=>"BRA",
+                "District"=>$customer->getBillingDistrict()
+            ],
+        ];
+
+        if(strcmp(strtolower($this->getPaymentType()), "creditcard")==0)
+        {
+            $data["DeliveryAddress"]=[
+                "Street"=>$card->getShippingAddress1(),
+                "Number"=>$card->getShippingNumber(),
+                "Complement"=>$card->getShippingAddress2(),
+                "ZipCode"=>$card->getShippingPostcode(),
+                "City"=>$card->getShippingCity(),
+                "State"=>$card->getShippingState(),
+                "Country"=>"BRA",
+                "District"=>$card->getShippingDistrict()
+            ];
+        }
+
+        return $data;
+    }
+
+    public function getItemData()
+    {
+        $data = [];
+        $items = $this->getItems();
+
+        if ($items) {
+            foreach ($items as $n => $item) {
+                $item_array = [];
+                $item_array['id'] = $n+1;
+                $item_array['title'] = $item->getName();
+                $item_array['description'] = $item->getName();
+                //$item_array['category_id'] = $item->getCategoryId();
+                $item_array['quantity'] = (int)$item->getQuantity();
+                //$item_array['currency_id'] = $this->getCurrency();
+                $item_array['unit_price'] = (double)($this->formatCurrency($item->getPrice()));
+
+                array_push($data, $item_array);
+            }
+        }
+
+        return $data;
     }
 
     public function getResource()

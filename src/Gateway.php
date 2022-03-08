@@ -65,6 +65,12 @@ class Gateway extends AbstractGateway
         return $this->setParameter('merchantKey', $value);
     }
 
+    public function parseResponse($data)
+    {
+        $request = $this->createRequest('\Omnipay\RedeCard\Message\PurchaseRequest', []);
+        return new \Omnipay\RedeCard\Message\Response($request, (array)$data);
+    }
+
     /**
      * Authorize Request
      *

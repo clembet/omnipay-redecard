@@ -26,7 +26,7 @@ class VoidRequest extends AbstractRequest
         $this->validate('transactionId', 'amount');
         //$data = parent::getData();
         $data = [
-            'amount' => $this->getAmount(),
+            'amount' => $this->getAmountInteger(),
             'urls' => [
                 [
                     "kind"=> "callback",
@@ -61,15 +61,5 @@ class VoidRequest extends AbstractRequest
         $httpResponse = $this->httpClient->request($this->getMethod(), $url, $headers, $this->toJSON($data));
         $json = $httpResponse->getBody()->getContents();
         return $this->createResponse(@json_decode($json, true));
-    }
-
-    public function getTransactionID()
-    {
-        return $this->getParameter('transactionId');
-    }
-
-    public function setTransactionID($value)
-    {
-        return $this->setParameter('transactionId', $value);
     }
 }

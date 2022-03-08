@@ -32,7 +32,7 @@ class AuthorizeRequest extends AbstractRequest
                 "capture"=> false,
                 "kind"=> "credit",
                 "reference"=> $this->getOrderId(), //TODO: verificar se o tamanho máximo do pedido_num tem tamanho máximo 16
-                "amount"=> $this->getAmount(),
+                "amount"=> $this->getAmountInteger(),
                 "cardholderName"=> $card->getName(),
                 "cardNumber"=> $card->getNumber(),
                 "expirationMonth"=> $card->getExpiryMonth(),
@@ -87,7 +87,7 @@ class AuthorizeRequest extends AbstractRequest
             "Payment"=>[
                 "Provider"=>$this->getTestMode()?"Simulado":$this->getPaymentProvider(), // https://braspag.github.io/manual/braspag-pagador#lista-de-providers
                 "Type"=>"CreditCard",
-                "Amount"=>$this->getAmount(),
+                "Amount"=>$this->getAmountInteger(),
                 "Currency"=>"BRL",
                 "Country"=>"BRA",
                 "Installments"=>$this->getInstallments(),
@@ -108,82 +108,6 @@ class AuthorizeRequest extends AbstractRequest
                 ],
             ]
         ];*/
-
-        return $data;
-    }
-
-    
-
-    public function getCustomer()
-    {
-        return $this->getParameter('customer');
-    }
-
-    public function setCustomer($value)
-    {
-        return $this->setParameter('customer', $value);
-    }
-
-    public function getCustomerData()
-    {
-        $card = $this->getCard();
-        $customer = $this->getCustomer();
-
-        $data = [
-            "Name"=>$customer->getName(),
-            "Identity"=>$customer->getDocumentNumber(),
-            "IdentityType"=>"CPF",
-            "Email"=>$customer->getEmail(),
-            "Birthdate"=>$customer->getBirthday('Y-m-d'),// formato ISO
-            "IpAddress"=>$this->getClientIp(),
-            "Address"=>[
-                "Street"=>$customer->getBillingAddress1(),
-                "Number"=>$customer->getBillingNumber(),
-                "Complement"=>$customer->getBillingAddress2(),
-                "ZipCode"=>$customer->getBillingPostcode(),
-                "City"=>$customer->getBillingCity(),
-                "State"=>$customer->getBillingState(),
-                "Country"=>"BRA",
-                "District"=>$customer->getBillingDistrict()
-            ],
-        ];
-
-        if(strcmp(strtolower($this->getPaymentType()), "creditcard")==0)
-        {
-            $data["DeliveryAddress"]=[
-                "Street"=>$card->getShippingAddress1(),
-                "Number"=>$card->getShippingNumber(),
-                "Complement"=>$card->getShippingAddress2(),
-                "ZipCode"=>$card->getShippingPostcode(),
-                "City"=>$card->getShippingCity(),
-                "State"=>$card->getShippingState(),
-                "Country"=>"BRA",
-                "District"=>$card->getShippingDistrict()
-            ];
-        }
-
-        return $data;
-    }
-
-    public function getItemData()
-    {
-        $data = [];
-        $items = $this->getItems();
-
-        if ($items) {
-            foreach ($items as $n => $item) {
-                $item_array = [];
-                $item_array['id'] = $n+1;
-                $item_array['title'] = $item->getName();
-                $item_array['description'] = $item->getName();
-                //$item_array['category_id'] = $item->getCategoryId();
-                $item_array['quantity'] = (int)$item->getQuantity();
-                //$item_array['currency_id'] = $this->getCurrency();
-                $item_array['unit_price'] = (double)($this->formatCurrency($item->getPrice()));
-
-                array_push($data, $item_array);
-            }
-        }
 
         return $data;
     }
