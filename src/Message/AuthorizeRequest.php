@@ -32,7 +32,7 @@ class AuthorizeRequest extends AbstractRequest
                 "capture"=> false,
                 "kind"=> "credit",
                 "reference"=> $this->getOrderId(), //TODO: verificar se o tamanho máximo do pedido_num tem tamanho máximo 16
-                "amount"=> $this->getAmountInteger(),
+                "amount"=> (int)($this->getAmount()*100.0),
                 "cardholderName"=> $card->getName(),
                 "cardNumber"=> $card->getNumber(),
                 "expirationMonth"=> $card->getExpiryMonth(),
@@ -87,7 +87,7 @@ class AuthorizeRequest extends AbstractRequest
             "Payment"=>[
                 "Provider"=>$this->getTestMode()?"Simulado":$this->getPaymentProvider(), // https://braspag.github.io/manual/braspag-pagador#lista-de-providers
                 "Type"=>"CreditCard",
-                "Amount"=>$this->getAmountInteger(),
+                "Amount"=>(int)($this->getAmount()*100.0),
                 "Currency"=>"BRL",
                 "Country"=>"BRA",
                 "Installments"=>$this->getInstallments(),
